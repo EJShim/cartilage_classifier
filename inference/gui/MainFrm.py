@@ -38,18 +38,18 @@ class E_MainWindow(QMainWindow):
 
         self.m_saveDir = '~/'
         try:
-            with open(os.path.join(root_path, 'path_tmp'), 'r') as text_file:
+            with open(os.path.join(root_path, 'res', 'path_tmp'), 'r') as text_file:
                 self.m_saveDir = text_file.read().replace('\n', '')
         except:
-            with open(os.path.join(root_path, 'path_tmp'), 'w') as text_file:
+            with open(os.path.join(root_path, 'res', 'path_tmp'), 'w') as text_file:
                 print(self.m_saveDir, file=text_file)
 
         self.m_capDir = '~/'
         try:
-            with open(os.path.join(root_path, 'capture_path'), 'r') as text_file:
+            with open(os.path.join(root_path, 'res', 'capture_path'), 'r') as text_file:
                 self.m_capDir = text_file.read().replace('\n', '')
         except:
-            with open(os.path.join(root_path, 'capture_path'), 'w') as text_file:
+            with open(os.path.join(root_path, 'res', 'capture_path'), 'w') as text_file:
                 print(self.m_capDir, file=text_file)
 
 
@@ -106,10 +106,7 @@ class E_MainWindow(QMainWindow):
 
     def eventFilter(self, obj, event):
         # print(event)
-        if event.type() == QEvent.ShortcutOverride:
-            
-            if event.key() == Qt.Key_Space:          
-                self.onSaveData()
+        if event.type() == QEvent.ShortcutOverride:            
             if event.key() == Qt.Key_V:
                 self.onImportVolume()
             return True # means stop event propagation
@@ -314,33 +311,10 @@ class E_MainWindow(QMainWindow):
         
         #Save SaveDir
         self.m_saveDir = path
-        with open(os.path.join(root_path, 'path_tmp'), 'w') as text_file:
+        with open(os.path.join(root_path, 'res', 'path_tmp'), 'w') as text_file:
             print(self.m_saveDir, file=text_file)
         dirName = str(path).lower()
 
-    
-        if not dirName.find('none') == -1:
-            self.Mgr.SetLog("None-RCT Data")
-            self.rctGroup.itemAt(0).widget().setChecked(True)
-        elif not dirName.find('small') == -1:
-            self.Mgr.SetLog("Small RCT Data")
-            self.rctGroup.itemAt(1).widget().setChecked(True)
-        elif not dirName.find('medium') == -1:
-            self.Mgr.SetLog("Medium RCT Data")
-            self.rctGroup.itemAt(2).widget().setChecked(True)
-        elif not dirName.find('large') == -1:
-            self.Mgr.SetLog("Large RCT Data")
-            self.rctGroup.itemAt(3).widget().setChecked(True)
-        elif not dirName.find('massive') == -1:
-            self.Mgr.SetLog("Massive RCT Data")
-            self.rctGroup.itemAt(4).widget().setChecked(True)
-        elif not dirName.find('partial') == -1:
-            if not dirName.find('below') == -1:
-                self.Mgr.SetLog("partial below 50")
-                self.rctGroup.itemAt(5).widget().setChecked(True)
-            if not dirName.find('upper') == -1:
-                self.Mgr.SetLog("partial upper 50")
-                self.rctGroup.itemAt(6).widget().setChecked(True)
 
         try :
             self.Mgr.VolumeMgr.ImportVolume(path)
@@ -351,63 +325,6 @@ class E_MainWindow(QMainWindow):
 
         self.Mgr.Redraw()
         self.Mgr.Redraw2D()
-
-    def onSaveData(self):
-        
-        if self.m_saveDir == None:
-            self.Mgr.SetLog("No save data available", error=True)
-            return
-        if self.Mgr.VolumeMgr.m_resampledVolumeData.any() == None:
-            self.Mgr.SetLog("Volume Data Need to be Resampled", error=True)
-            return            
-        try:
-            orientation = 'unknown'
-            for idx in range(0, self.orientationGroup.count()):
-                item = self.orientationGroup.itemAt(idx).widget()
-                if item.isChecked():
-                    orientation = item.text()
-                    break
-
-            protocol = 'unknown'
-            for idx in range(0, self.protocolGroup.count()):
-                item = self.protocolGroup.itemAt(idx).widget()
-                if item.isChecked():
-                    protocol = item.text()
-                    break
-
-            rct = 'unknown'
-            for idx in range(0, self.rctGroup.count()):
-                item = self.rctGroup.itemAt(idx).widget()
-                if item.isChecked():
-                    rct = item.text()
-                    break
-
-
-            #Save Series and Resampling Position For Futer Work
-            series = int(self.m_SeriesNumber.text())
-            xPos = self.m_rangeSlider[0].value() / 1000
-            yPos = self.m_rangeSlider[1].value() / 1000
-
-            savePath = self.m_saveDir + '/' + rct + "_" + orientation + "_" + protocol
-
-            if os.path.exists(savePath + '.npz'):
-                now = datetime.datetime.now()
-                savePath += now.strftime('%H_%M_%S')
-            log = "Save Processed Data in (" + savePath   + ".npz" +  ")"            
-            self.Mgr.SetLog(log)
-            
-            np.savez_compressed(savePath, series = series, 
-                                            x = xPos, y = yPos, 
-                                            status = rct, 
-                                            orientation = orientation, 
-                                            protocol = protocol, 
-                                            data=self.Mgr.VolumeMgr.m_resampledVolumeData)
-
-
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            self.Mgr.SetLog(str(e), error=True)
 
     def TogglePrediction(self, pred):        
         self.Mgr.m_bPred = pred
@@ -427,7 +344,7 @@ class E_MainWindow(QMainWindow):
             self.m_croppingWidget.show()
         else:
             self.m_croppingWidget.hide()
-            
+
     def onVolumeTreeState(self, state):
         if state == 2: #show
             self.m_treeWidget.show()
@@ -543,7 +460,7 @@ class E_MainWindow(QMainWindow):
     
 
         self.m_capDir = os.path.dirname(dir_path[0])
-        with open(os.path.join(root_path, 'capture_path'), 'w') as text_file:
+        with open(os.path.join(root_path, 'res', 'capture_path'), 'w') as text_file:
             print(self.m_capDir, file=text_file)
 
 

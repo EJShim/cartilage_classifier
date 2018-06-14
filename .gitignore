@@ -1,3 +1,5 @@
 data/*
 .vscode/*
 .inference/gui/__pycache__/
+.inference/manager/__pycache__/
+.inference/res/__pycache__/
