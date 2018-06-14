@@ -285,9 +285,6 @@ class E_MainWindow(QMainWindow):
         self.m_rangeSlider[1].valueChanged.connect(self.onRangeSliderValueChanged)
 
         leftLayout.addWidget(self.m_croppingWidget)
-        
-        
-
 
         #Initialize Main View
         self.InitRendererView(MainLayout)                
