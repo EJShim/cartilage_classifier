@@ -458,7 +458,7 @@ class E_VolumeManager:
         ########################TEMP DICOM TAG INFO READRE############################
         side = 'right'
         imagePositionPatient = metadata["0020|0032"].split('\\')
-        if float(imagePositionPatient[0]) > 0.0:
+        if float(imagePositionPatient[0]) > -10.0:
             side='left'
 
         print(imagePositionPatient, side)

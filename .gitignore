@@ -4,3 +4,4 @@ inference/gui/__pycache__/
 inference/manager/__pycache__/*
 inference/res/__pycache__/*
 inference/res/path_tmp
+inference/__pycache__/
