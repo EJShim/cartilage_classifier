@@ -41,12 +41,12 @@ class E_VolumeTreeWidget(QTreeWidget):
             if not description.find('fs/') == -1 or not description.find('fs ') == -1 or not description.find('fat') == -1 or not description.find('f/s') == -1 or description.endswith('fs') or not description.find('fs_') == -1 or not description.find('spir') == -1 or not description.find('spair') == -1:                
                 child.setBackground(0, QBrush(QColor('green')))
                 
-                if not description.find('cor') == -1:
-                    child.setForeground(0, QBrush(QColor('red')))
+                # if not description.find('cor') == -1:
+                #     child.setForeground(0, QBrush(QColor('red')))
                                         
 
-            elif description.find('t1') == -1 and description.find('t2')== -1:
-                child.setBackground(0, QBrush(QColor('red')))
+            # elif description.find('t1') == -1 and description.find('t2')== -1:
+            #     child.setBackground(0, QBrush(QColor('red')))
         self.expandAll()
 
 

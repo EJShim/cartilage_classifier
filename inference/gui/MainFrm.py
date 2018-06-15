@@ -8,7 +8,6 @@ from gui.VolumeTreeWidget import E_VolumeTreeWidget
 from gui.RendererViewWidget import E_MainRenderingWidget
 import datetime
 
-
 import vtk
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 import sys, os
@@ -56,20 +55,15 @@ class E_MainWindow(QMainWindow):
         self.setWindowTitle("RCT Classifier")
         self.keyPlaying = {}
 
-
         #Central Widget
         self.m_centralWidget = QWidget()
         self.setCentralWidget(self.m_centralWidget)
 
-
         #Volume List Dialog
         self.m_volumeListDlg = E_VolumeListWidget()
 
-
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.UpdateRenderer)
-
-
 
         #Bone Color, RCT
         self.m_bBoneColorBlack = "Black"
