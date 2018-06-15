@@ -17,20 +17,20 @@ class E_VolumeTreeWidget(QTreeWidget):
         self.setSortingEnabled(False)
 
         self.itemDoubleClicked.connect(self.dbcEvent)
-
+        
     def updateTree(self, info):
     
+        #Read Metadata
+        metadata = info['metadata']
+
+        #Add Tree Top Level Item
         self.clear()
         parent = QTreeWidgetItem(self)
-        parent.setText(0, info['name'])
+        parent.setText(0, metadata[0]["0008|1030"])
         self.addTopLevelItem(parent)
 
-
-        serieses = info['serieses']
-        for series in serieses:
-            dicomIO = series.GetImageIO()
-            metadict = dicomIO.GetMetaDataDictionary()
-            series_description = metadict["0008|103e"]
+        for series in metadata:            
+            series_description = series["0008|103e"]
 
             child = QTreeWidgetItem()
             child.setText(0, series_description)

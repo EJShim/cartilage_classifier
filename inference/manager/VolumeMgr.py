@@ -187,8 +187,9 @@ class E_VolumeManager:
         namesGenerator.SetDirectory(fileSeries)
         seriesUID = namesGenerator.GetSeriesUIDs()
 
-        serieses = []
-        studyDescription = None
+        volumedata = []
+        metadata = []
+    
         for seriesIdentifier in seriesUID:
             fileNames = namesGenerator.GetFileNames(seriesIdentifier)
             reader = itk.ImageSeriesReader[ImageType].New()
@@ -196,13 +197,12 @@ class E_VolumeManager:
             reader.SetImageIO(dicomIO)
             reader.SetFileNames(fileNames)
             reader.Update()
-            serieses.append(reader)
 
-            if studyDescription == None:
-                studyDescription = dicomIO.GetMetaDataDictionary()["0008|1030"]
+            ##Make Dictionary
+            volumedata.append(reader)
+            metadata.append(dicomIO.GetMetaDataDictionary())
                 
-
-        patient = dict(name=studyDescription, serieses = serieses)
+        patient = dict(volumedata = volumedata, metadata = metadata)
         self.m_volumeInfo = patient
         self.UpdateVolumeTree()
         self.Mgr.ClearScene()
@@ -452,17 +452,38 @@ class E_VolumeManager:
         self.Mgr.ClearScene()        
         
         self.m_selectedIdx = idx
-        selected_data = self.m_volumeInfo['serieses'][idx]
+        volumedata = self.m_volumeInfo['volumedata'][idx]
+        metadata = self.m_volumeInfo['metadata'][idx]
+        
+        ########################TEMP DICOM TAG INFO READRE############################
+        side = 'right'
+        imagePositionPatient = metadata["0020|0032"].split('\\')
+        if float(imagePositionPatient[0]) > 0.0:
+            side='left'
+
+        print(imagePositionPatient, side)
+        ########################TEMP DICOM TAG INFO READRE############################
 
         #Adjust Orientation        
         orienter = itk.OrientImageFilter[ImageType, ImageType].New()
         orienter.UseImageDirectionOn()
-        orienter.SetInput(selected_data.GetOutput())
+        orienter.SetInput(volumedata.GetOutput())
         orienter.Update()
-        
+        image = orienter.GetOutput()
+
+
+        if side == 'left':   
+            flipper = itk.FlipImageFilter[ImageType].New()
+            flipper.SetInput(image)
+            flipper.SetFlipAxes((True, False, False))
+            flipper.Update()
+            image = flipper.GetOutput()
+
+
+    
         #Rescale Image Intensity 0 ~ 255
         normalizer = itk.RescaleIntensityImageFilter[ImageType, ImageType].New()
-        normalizer.SetInput(orienter.GetOutput())
+        normalizer.SetInput(image)
         normalizer.SetOutputMinimum(0)
         normalizer.SetOutputMaximum(255)
         normalizer.Update()
