@@ -1,4 +1,4 @@
-data/*
+data/
 .vscode/*
 inference/gui/__pycache__/
 inference/manager/__pycache__/*
