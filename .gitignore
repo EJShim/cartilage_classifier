@@ -5,3 +5,6 @@ inference/manager/__pycache__/*
 inference/res/__pycache__/*
 inference/res/path_tmp
 inference/__pycache__/
+train/__pycache__/
+train/record.xlsx
+train/saved/
